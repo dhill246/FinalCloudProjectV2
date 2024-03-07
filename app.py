@@ -3,8 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from final_cloud_project_v2.final_cloud_project_v2_stack import FinalCloudProjectV2Stack
-
+from stacks.v2_stack import FinalCloudProjectV2Stack
 
 app = cdk.App()
 FinalCloudProjectV2Stack(app, "FinalCloudProjectV2Stack",
