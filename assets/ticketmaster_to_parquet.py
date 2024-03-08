@@ -7,12 +7,11 @@ import pandas as pd
 import sys
 from datetime import datetime, timedelta
 
-
 # This cannot import locally, only for Glue Environment:
-# from awsglue.utils import getResolvedOptions
+from awsglue.utils import getResolvedOptions
 
 # Get bucket argument from stack file
-# job_args = getResolvedOptions(sys.argv, ["my_bucket"])
+job_args = getResolvedOptions(sys.argv, ["my_bucket"])
 
 # Fetch Ticketmaster API key
 def get_secret():
@@ -39,10 +38,9 @@ def get_secret():
     parsed_json = json.loads(secret)
     api_key = parsed_json["TICKETMASTER_API_KEY"]
 
-    return secret
+    return api_key
 
-# api_key = get_secret()
-api_key = "tOJRk4CNkXI1xr1vPne8ncHpAM9P0ZzU"
+api_key = get_secret()
 
 print("Running...")
 
@@ -106,7 +104,8 @@ for single_date in (start_date + timedelta(n) for n in range((end_date - start_d
                     'min_price': min_price,
                     'max_price': max_price,
                     'latitude': event.get('_embedded', {}).get('venues', [{}])[0].get('location', {}).get('latitude', 'N/A'),
-                    'longitude': event.get('_embedded', {}).get('venues', [{}])[0].get('location', {}).get('longitude', 'N/A')
+                    'longitude': event.get('_embedded', {}).get('venues', [{}])[0].get('location', {}).get('longitude', 'N/A'),
+                    'date_pulled': start_date.strftime('%m/%d/%Y')
                 })
             
             if total_pages is None:
@@ -122,7 +121,7 @@ df = pd.DataFrame(all_events)
 df['min_price'] = pd.to_numeric(df['min_price'], errors='coerce')
 df['max_price'] = pd.to_numeric(df['max_price'], errors='coerce')
 
-# df.to_parquet(f"s3://{job_args['my_bucket']}/ticketmaster_new.parquet", index=False)
+df.to_parquet(f"s3://{job_args['my_bucket']}/ticketmaster_new.parquet", index=False)
 
-df.to_parquet('rock_data_3-6.parquet')
-print("Created rock_data_3-6.parquet")
+# df.to_parquet('rock_data_3-6.parquet')
+# print("Created rock_data_3-6.parquet")

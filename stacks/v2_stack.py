@@ -78,45 +78,43 @@ class FinalCloudProjectV2Stack(cdk.Stack):
         # Second job that takes the data out of /Fragments, processes it
         # and converts into a single large parquet inside /Processed in the data bucket
         # TODO: Update the script name once it goes into assets folder
-        # fragments_to_parquet_job = glue.CfnJob(self, "fragments_to_parquet_job",
-        #                                        name="fragments_to_parquet_job",
-        #                                        command=glue.CfnJob.JobCommandProperty(
-        #                                             name="pythonshell",
-        #                                             python_version="3.9",
-        #                                             script_location=f"s3://{scripts_bucket.bucket_name}/assets/REPLACE_WITH_SCRIPT_NAME.py"
-        #                                 ),
-        #                                 role=glue_role.role_arn,
-        #                                 glue_version="3.0",
-        #                                 max_capacity=1,
-        #                                 timeout=3,
-        #                                 default_arguments={
-        #                                     "--my_bucket": data_bucket.bucket_name
-        #                                 })
+        fragments_to_parquet_job = glue.CfnJob(self, "fragments_to_parquet_job",
+                                               name="fragments_to_parquet_job",
+                                               command=glue.CfnJob.JobCommandProperty(
+                                                    name="pythonshell",
+                                                    python_version="3.9",
+                                                    script_location=f"s3://{scripts_bucket.bucket_name}/assets/merge_parquet_final.py"
+                                        ),
+                                        role=glue_role.role_arn,
+                                        glue_version="3.0",
+                                        max_capacity=1,
+                                        timeout=3,
+                                        default_arguments={
+                                            "--my_bucket": data_bucket.bucket_name
+                                        })
 
         # Set up trigger for first job to run daily at 4:00am Cali time
         job_1_trigger = glue.CfnTrigger(self, "initial_trigger",
                                         name="initial_trigger",
                                         actions=[glue.CfnTrigger.ActionProperty(job_name=ticketmaster_download_job.name)],
-                                        type="ON_DEMAND",
-                                        # schedule="cron(0 11 * * ? *)",
+                                        type="SCHEDULED",
+                                        schedule="cron(0 11 * * ? *)",
                                         workflow_name=my_workflow.name)
         
-        # Set up predicate property that will cause the next trigger to run
-        # job_2_predicate = glue.CfnTrigger.PredicateProperty(
-        #     conditions=[glue.CfnTrigger.ConditionProperty(
-        #         job_name=ticketmaster_download_job.name,
-        #         logical_operator="EQUALS",
-        #         state="SUCCEEDED"
-        #     )]
-        # )
 
         # Set up trigger for second job to run after first job completes
-        # job_2_trigger = glue.CfnTrigger(self, "frag_trigger",
-        #                                 name="frag_trigger",
-        #                                 actions=[glue.CfnTrigger.ActionProperty(job_name=fragments_to_parquet_job.name)],
-        #                                 type="CONDITIONAL",
-        #                                 predicate=job_2_predicate,
-        #                                 workflow_name=my_workflow.name)
+        job_2_trigger = glue.CfnTrigger(self, "frag_trigger",
+                                        name="frag_trigger",
+                                        actions=[glue.CfnTrigger.ActionProperty(job_name=fragments_to_parquet_job.name)],
+                                        type="CONDITIONAL",
+                                        start_on_creation=True,
+                                        workflow_name=my_workflow.name,
+                                        predicate=glue.CfnTrigger.PredicateProperty(
+                                                        conditions=[glue.CfnTrigger.ConditionProperty(
+                                                            state="SUCCEEDED",
+                                                            logical_operator="EQUALS",
+                                                            job_name=ticketmaster_download_job.name
+                                                        )]))
 
         # Configure data catalog for creating schema on final created parquet in /Processed
         # glue_data_cataloging = glue.CfnDatabase(self, "ticketmaster_db",
