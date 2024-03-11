@@ -92,12 +92,28 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                         default_arguments={
                                             "--my_bucket": data_bucket.bucket_name
                                         })
+        
+        parquet_analysis_job = glue.CfnJob(self, "parquet_analysis_job",
+                                           name="parquet_analysis_job",
+                                           command=glue.CfnJob.JobCommandProperty(
+                                               name="pythonshell",
+                                               python_version="3.9",
+                                               script_location=f"s3://{scripts_bucket.bucket_name}/assets/REPLACE_NAME.py"
+                                        ),
+                                        role=glue_role.role_arn,
+                                        glue_version="3.0",
+                                        max_capacity=1,
+                                        timeout=3,
+                                        default_arguments={
+                                            "--my_bucket": data_bucket.bucket_name
+                                        })
 
         # Set up trigger for first job to run daily at 4:00am Cali time
         job_1_trigger = glue.CfnTrigger(self, "initial_trigger",
                                         name="initial_trigger",
                                         actions=[glue.CfnTrigger.ActionProperty(job_name=ticketmaster_download_job.name)],
                                         type="SCHEDULED",
+                                        start_on_creation=True,
                                         schedule="cron(0 11 * * ? *)",
                                         workflow_name=my_workflow.name)
         
@@ -115,6 +131,20 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                                             logical_operator="EQUALS",
                                                             job_name=ticketmaster_download_job.name
                                                         )]))
+        
+        job_3_trigger = glue.CfnTrigger(self, "analysis_trigger",
+                                        name="analysis_trigger",
+                                        actions=[glue.CfnTrigger.ActionProperty(job_name=parquet_analysis_job.name)],
+                                        type="CONDITIONAL",
+                                        start_on_creation=True,
+                                        workflow_name=my_workflow.name,
+                                        predicate=glue.CfnTrigger.PredicateProperty(
+                                                        conditions=[glue.CfnTrigger.ConditionProperty(
+                                                            state="SUCCEEDED",
+                                                            logical_operator="EQUALS",
+                                                            job_name=parquet_analysis_job.name
+                                                        )])
+                                        )
 
         # Configure data catalog for creating schema on final created parquet in /Processed
         # glue_data_cataloging = glue.CfnDatabase(self, "ticketmaster_db",

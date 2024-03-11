@@ -13,7 +13,7 @@ import sys
 
 
 s3 = boto3.client('s3')
-job_args =getResolvedOptions(sys.argv,["my_bucket"])
+job_args = getResolvedOptions(sys.argv,["my_bucket"])
 bucket= job_args["my_bucket"]
 
 source=f"s3://{bucket}/combined_data.parquet"
