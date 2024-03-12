@@ -36,7 +36,6 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                 auto_delete_objects=True)
 
         # Create bucket for housing scripts inside assets
-
         scripts_bucket = s3.Bucket(self, "glue_scripts",
                                    versioned=True,
                                    block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
@@ -48,10 +47,16 @@ class FinalCloudProjectV2Stack(cdk.Stack):
         scripts_bucket.grant_read(glue_role)
 
         # Dump assets scripts into glue script bucket
-        s3deploy.BucketDeployment(self, "deploy",
+        s3deploy.BucketDeployment(self, "deploy_assets",
                                   sources=[s3deploy.Source.asset("./assets/")],
                                   destination_bucket=scripts_bucket,
                                   destination_key_prefix="assets/")
+        
+        # Dump pages scripts into data bucket
+        # s3deploy.BucketDeployment(self, "deploy_pages",
+        #                           sources=[s3deploy.Source.asset("./pages/")],
+        #                           destination_bucket=data_bucket,
+        #                           destination_key_prefix="/")
         
         # Initialize glue workflow
         my_workflow = glue.CfnWorkflow(self, "ticketmaster_workflow",
