@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticketmaster Analysis: Rock Concerts</title>
+    <style>
+      body {
+        text-align: center;
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+      }
+      .overview {
+        margin-bottom: 30px; /* Space before the first image section */
+        padding: 0 20px; /* Padding on the sides for smaller screens */
+      }
+      .overview h2 {
+        color: #007bff; /* A color that stands out for the page's overall title */
+        margin-bottom: 15px; /* Space between title and description */
+      }
+      .overview p {
+        color: #333; /* Dark color for readability */
+        font-size: 16px; /* Slightly larger font size for the description */
+        line-height: 1.5; /* Line height for better readability */
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .link-wrapper {
+        margin-bottom: 40px;
+      }
+      .link-wrapper a {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+      }
+      .link-wrapper a:hover {
+        background-color: #0056b3;
+      }
+      .image-wrapper {
+        margin: 20px auto;
+        display: block;
+        width: 90%;
+        max-width: 600px;
+      }
+      img {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+      @media (min-width: 768px) {
+        .image-wrapper {
+          width: calc(50% - 40px);
+          display: inline-block;
+        }
+      }
+      @media (min-width: 1024px) {
+        .image-wrapper {
+          width: calc(33.33% - 40px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overview">
+      <h1>Ticketmaster Analysis: Rock Concerts</h1>
+      <p>
+        Welcome to our website! For our Cloud Computing class for our Masters in
+        Business Analytics program at Cal Poly, we created this website to
+        highlight our skills in AWS data analytics. In this project, we analyze
+        data from Ticketmaster regarding rock concerts. Our analysis is updated
+        daily by pulling from the Ticketmaster API.
+      </p>
+      <p>
+        By: Alexa Hildebrand, Eva Murdock, Daniel Hill, Toby Guenthner, Fernando
+        Fonseca
+      </p>
+    </div>
+    <h1></h1>
+    <div class="link-wrapper">
+      <a
+        href="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.us-west-2.amazonaws.com/your_map.html"
+        download="InteractiveEventsMap.html"
+        >Interactive Events Map</a
+      >
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/complete_correlation.png"
+        alt="Complete Correlation"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/expensive_venue.png"
+        alt="Expensive Venue"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/high_median_venue.png"
+        alt="High Median Venue"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/max_city.png"
+        alt="Max City"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/max_diff_event_day.png"
+        alt="Max Difference Event Day"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/max_over_time.png"
+        alt="Max Over Time"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/max_price_by_day.png"
+        alt="Max Price By Day"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/min_diff_event_day.png"
+        alt="Min Difference Event Day"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/min_price_by_day.png"
+        alt="Min Price By Day"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/popular_venue.png"
+        alt="Popular Venue"
+      />
+    </div>
+    <div class="image-wrapper">
+      <img
+        src="https://finalcloudprojectv2stack-finaldataca7db91c-2y2wmpqdodrs.s3.amazonaws.com/images/price_change.png"
+        alt="Price Change"
+      />
+    </div>
+    <script>
+      // Function to request fullscreen for a given element
+      function makeFullScreen(elem) {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          // Safari
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          // IE11
+          elem.msRequestFullscreen();
+        }
+      }
+
+      // Add click event listeners to all images
+      document.querySelectorAll(".image-wrapper img").forEach((image) => {
+        image.addEventListener("click", function () {
+          makeFullScreen(this);
+        });
+      });
+    </script>
+  </body>
+</html>

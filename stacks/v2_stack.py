@@ -31,7 +31,7 @@ class FinalCloudProjectV2Stack(cdk.Stack):
         # Create bucket for data storage
         data_bucket = s3.Bucket(self, "final_data",
                                 versioned=True,
-                                block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+                                public_read_access=True,
                                 removal_policy=cdk.RemovalPolicy.DESTROY,
                                 auto_delete_objects=True)
 
