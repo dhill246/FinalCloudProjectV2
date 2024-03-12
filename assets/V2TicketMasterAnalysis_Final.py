@@ -94,7 +94,7 @@ plt.gca().invert_xaxis()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'price_change.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/price_change.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -126,7 +126,7 @@ plt.xticks(rotation=45, fontsize=12)
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'max_price_by_day.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/max_price_by_day.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -147,7 +147,7 @@ plt.xticks(rotation=45, fontsize=12)
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'min_price_by_day.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/min_price_by_day.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -174,7 +174,7 @@ plt.tight_layout()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'popular_venue.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/popular_venue.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -201,7 +201,7 @@ plt.tight_layout()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'expensive_venue.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/expensive_venue.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -235,24 +235,25 @@ plt.tight_layout()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'max_over_time.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/max_over_time.png')
 
 
 # After uploading, you can safely close the plot and buffer
 plt.close()
 plot_buffer.close()
 
+
 #DIFF BETWEEN EVENT day PRICE AND dayS AHEAD PRICE -----------------
-curr_events = full_data[full_data['days_Till_Event'] == 0]
-merged = pd.merge(curr_events,full_data,on=['name','city','state','day','genre','date','venue','latitude','longitude']).drop(columns=['days_Till_Event_x','genre','time_y','date_pulled_y'])
-merged.columns = ['name','date','time','venue','city','state','min_price_dayof','max_price_dayof','latitude','longitude','date_pulled','day','min_price_other','max_price_other','days_Till_Event']
+curr_events = full_data[full_data['Days_Till_Event'] == 0]
+merged = pd.merge(curr_events,full_data,on=['name','city','state','day','genre','date','venue','latitude','longitude']).drop(columns=['Days_Till_Event_x','genre','time_y','date_pulled_y'])
+merged.columns = ['name','date','time','venue','city','state','min_price_dayof','max_price_dayof','latitude','longitude','date_pulled','day','min_price_other','max_price_other','Days_Till_Event']
 
 merged['min_price_diff_rel'] = (-merged['min_price_dayof'] + merged['min_price_other'])/merged['min_price_dayof']
 merged['max_price_diff_rel'] = (-merged['max_price_dayof'] + merged['max_price_other'])/merged['max_price_dayof']
 
 # Create the scatter plot
 plt.figure(figsize=(8, 6))
-plt.scatter(merged['days_Till_Event'], merged['min_price_diff_rel'], color='blue', alpha=0.5)  # alpha sets transparency
+plt.scatter(merged['Days_Till_Event'], merged['min_price_diff_rel'], color='blue', alpha=0.5)  # alpha sets transparency
 plt.xlabel('days until the event')
 plt.ylabel('Price diff ($)')
 plt.title('Min Event day price - future day price')
@@ -264,8 +265,7 @@ plt.show()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'min_diff_event_day.png')
-
+s3.upload_fileobj(plot_buffer,bucket, 'images/min_diff_event_day.png')
 
 # After uploading, you can safely close the plot and buffer
 plt.close()
@@ -274,7 +274,7 @@ plot_buffer.close()
 
 # Create the scatter plot
 plt.figure(figsize=(8, 6))
-plt.scatter(merged['days_Till_Event'], merged['max_price_diff_rel'], color='blue', alpha=0.5)  # alpha sets transparency
+plt.scatter(merged['Days_Till_Event'], merged['max_price_diff_rel'], color='blue', alpha=0.5)  # alpha sets transparency
 plt.xlabel('days until the event')
 plt.ylabel('Price diff ($)')
 plt.title('Max Event day price - future day price')
@@ -285,7 +285,7 @@ plt.tight_layout()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'max_diff_event_day.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/max_diff_event_day.png')
 
 
 # After uploading, you can safely close the plot and buffer
@@ -294,7 +294,7 @@ plot_buffer.close()
 
 
 #max price city -------
-unique_events_df = full_data.drop(columns=['date_pulled','days_Till_Event']).drop_duplicates()
+unique_events_df = full_data.drop(columns=['date_pulled','Days_Till_Event']).drop_duplicates()
 cities = unique_events_df[['city','min_price','max_price']].groupby(by='city').agg(["median","mean","std","count"])
 cities = cities.reset_index()
 cities.columns = ['city','min_price_median','min_price_mean','min_price_std','counta','max_price_median','max_price_mean','max_price_std','count']
@@ -321,14 +321,13 @@ plt.show()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'max_city.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/max_city.png')
 plt.close()
 plot_buffer.close()
 
 #CORRELATION MATRIX BETWEEN PRICE AND OTHER VARIABLES
 
-
-complete_correlation = associations(full_data[['venue','city','state','min_price','max_price','day','days_Till_Event']], filename= 'complete_correlation.png', figsize=(10,10),hide_rows=['city','state','day','days_Till_Event','venue'])
+complete_correlation = associations(full_data[['venue','city','state','min_price','max_price','day','Days_Till_Event']], filename= 'complete_correlation.png', figsize=(10,10),hide_rows=['city','state','day','days_Till_Event','venue'])
 df_complete_corr=complete_correlation['corr']
 df_complete_corr.dropna(axis=1, how='all').dropna(axis=0, how='all').style.background_gradient(cmap='coolwarm', axis=None)#.set_precision(2)
 # Plot heatmap
@@ -347,7 +346,7 @@ plt.yticks(range(len(df_complete_corr.index)), df_complete_corr.index)
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'complete_correlation.png')
+s3.upload_fileobj(plot_buffer,bucket, 'images/complete_correlation.png')
 plt.close()
 plot_buffer.close()
 
@@ -382,7 +381,7 @@ plt.tight_layout()
 plot_buffer = BytesIO()
 plt.savefig(plot_buffer, format='png')
 plot_buffer.seek(0)
-s3.upload_fileobj(plot_buffer,bucket, 'high_median_venue.png')
+s3.upload_fileobj(plot_buffer, bucket, 'images/high_median_venue.png')
 plt.close()
 plot_buffer.close()
 
