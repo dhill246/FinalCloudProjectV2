@@ -98,14 +98,15 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                            command=glue.CfnJob.JobCommandProperty(
                                                name="pythonshell",
                                                python_version="3.9",
-                                               script_location=f"s3://{scripts_bucket.bucket_name}/assets/REPLACE_NAME.py"
+                                               script_location=f"s3://{scripts_bucket.bucket_name}/assets/V2TicketMasterAnalysis_Final.py"
                                         ),
                                         role=glue_role.role_arn,
                                         glue_version="3.0",
                                         max_capacity=1,
                                         timeout=3,
                                         default_arguments={
-                                            "--my_bucket": data_bucket.bucket_name
+                                            "--my_bucket": data_bucket.bucket_name,
+                                            "--additional-python-modules": "dython==0.7.5,matplotlib==3.8.3,folium==0.16.0"
                                         })
 
         # Set up trigger for first job to run daily at 4:00am Cali time
@@ -142,7 +143,7 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                                         conditions=[glue.CfnTrigger.ConditionProperty(
                                                             state="SUCCEEDED",
                                                             logical_operator="EQUALS",
-                                                            job_name=parquet_analysis_job.name
+                                                            job_name=fragments_to_parquet_job.name
                                                         )])
                                         )
 
