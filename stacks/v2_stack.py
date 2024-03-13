@@ -6,7 +6,6 @@ import aws_cdk.aws_glue as glue
 import aws_cdk.aws_lambda as lambda_
 
 class FinalCloudProjectV2Stack(cdk.Stack):
-
     def __init__(self, scope: cdk.App, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -52,19 +51,12 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                   destination_bucket=scripts_bucket,
                                   destination_key_prefix="assets/")
         
-        # Dump pages scripts into data bucket
-        # s3deploy.BucketDeployment(self, "deploy_pages",
-        #                           sources=[s3deploy.Source.asset("./pages/")],
-        #                           destination_bucket=data_bucket,
-        #                           destination_key_prefix="/")
-        
         # Initialize glue workflow
         my_workflow = glue.CfnWorkflow(self, "ticketmaster_workflow",
                                 description="Workflow for processing Ticketmaster data to parquet")
 
         # Job to download data from ticketmaster, convert to parquet,
-        # and dump into the /Fragments folder within the data bucket
-        # TODO: Update the script name once it goes into assets folder
+        # and dump into the data bucket
         ticketmaster_download_job = glue.CfnJob(self, "download_ticketmaster_data",
                                                 name="download_ticketmaster_data",
                                                 command=glue.CfnJob.JobCommandProperty(
@@ -80,9 +72,8 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                             "--my_bucket": data_bucket.bucket_name
                                         })
 
-        # Second job that takes the data out of /Fragments, processes it
-        # and converts into a single large parquet inside /Processed in the data bucket
-        # TODO: Update the script name once it goes into assets folder
+        # Second job that takes the data out of new pull, processes it
+        # and converts into a single large parquet inside combined_data.parquet
         fragments_to_parquet_job = glue.CfnJob(self, "fragments_to_parquet_job",
                                                name="fragments_to_parquet_job",
                                                command=glue.CfnJob.JobCommandProperty(
@@ -98,6 +89,7 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                             "--my_bucket": data_bucket.bucket_name
                                         })
         
+        # Third job that takes combined data
         parquet_analysis_job = glue.CfnJob(self, "parquet_analysis_job",
                                            name="parquet_analysis_job",
                                            command=glue.CfnJob.JobCommandProperty(
@@ -138,6 +130,7 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                                             job_name=ticketmaster_download_job.name
                                                         )]))
         
+        # Set up third job trigger to run when second job completes
         job_3_trigger = glue.CfnTrigger(self, "analysis_trigger",
                                         name="analysis_trigger",
                                         actions=[glue.CfnTrigger.ActionProperty(job_name=parquet_analysis_job.name)],
@@ -151,6 +144,10 @@ class FinalCloudProjectV2Stack(cdk.Stack):
                                                             job_name=fragments_to_parquet_job.name
                                                         )])
                                         )
+
+        # We ended up not using a glue crawler or catalog, but the code below
+        # would be used if this was necessary if Athena needed to be used as the size of the data 
+        # continues to grow.
 
         # Configure data catalog for creating schema on final created parquet in /Processed
         # glue_data_cataloging = glue.CfnDatabase(self, "ticketmaster_db",
@@ -183,7 +180,3 @@ class FinalCloudProjectV2Stack(cdk.Stack):
         #                                 type="CONDITIONAL",
         #                                 predicate=crawler_predicate,
         #                                 workflow_name=my_workflow.name)
-        
-        # Add a lambda function here to be triggered when crawler finishes or second job maybe?
-
-
